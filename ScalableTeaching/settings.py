@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -58,13 +59,15 @@ ROOT_URLCONF = 'ScalableTeaching.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR), 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "webhook.context_processors.achievement_webhook_token",
+                
             ],
         },
     },
@@ -117,6 +120,11 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+# Achievement System Secrets/URLS
+ACHIEVEMENT_WEBHOOK_TOKEN="Tell me, for whom do you fight?"
+GITLAB_WEBHOOK_TOKEN="GitDeezNuts"
+GITLAB_URL="http://localhost:5000"
 
 
 # Static files (CSS, JavaScript, Images)

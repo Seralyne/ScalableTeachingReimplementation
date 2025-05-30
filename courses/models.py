@@ -17,6 +17,9 @@ class Course(models.Model):
     #        ('create_')
     #    ]
 
+    def __str__(self):
+        return self.name
+
 
 
 
@@ -42,6 +45,9 @@ class Achievement(models.Model):
         return all( # Return all completed tests
             CourseUserTriggerProgress.objects.filter(user=user, trigger=trigger, fulfilled=True).exists() for trigger in triggers
         )
+    
+    def __str__(self):
+        return self.name
 
 
 
@@ -49,8 +55,11 @@ class Achievement(models.Model):
 class AchievementTrigger(models.Model):
     achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE, related_name="triggers")
     triggering_test_name = models.CharField(max_length=200)
-    triggering_status = models.BooleanField(default=True)
+    triggering_status = models.BooleanField("Trigger on Test Success",default=True)
 
+    def __str__(self):
+        return self.achievement.name + " Trigger: " + self.triggering_test_name + " " + str(self.triggering_status)
+    
 
 
 # If I spin out the achievement models, spin out the
@@ -61,7 +70,7 @@ class CourseUser(models.Model):
     name = models.CharField(max_length=200)
     gitlab_user_id = models.IntegerField(default=0)
     #started_tasks = models.OneToMany()
-    achievements = models.ManyToManyField(Achievement)
+    achievements = models.ManyToManyField(Achievement, blank=True)
     points = models.IntegerField(default=0)
     leaderboard_optin = models.BooleanField(default=False)
 
@@ -104,6 +113,9 @@ class QueuedAchievementToast(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user','achievement'], name="unique_user_achievement_toast")
         ]
+    
+    def __str__(self):
+        return self.user.user.username + ": " + self.achievement.name
 
 
 

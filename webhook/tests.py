@@ -94,7 +94,7 @@ class WebhookTests(TestCase):
                                     HTTP_ACHIEVEMENT_WEBHOOK_TOKEN="Tell me, for whom do you fight?", 
                                     content_type="application/json", 
                                     data={
-                                        "user": course_user.id,
+                                        "user": course_user.user.username,
                                         }
                                     )
         
@@ -120,7 +120,7 @@ class WebhookTests(TestCase):
                                     content_type="application/json", 
                                     data={
                                         "id": test_achievement.id,
-                                        "user": -1
+                                        "user": "asdgfsdfg"
                                         }
                                     )
         
@@ -146,7 +146,7 @@ class WebhookTests(TestCase):
                                     content_type="application/json", 
                                     data={
                                         "id": -1,
-                                        "user": course_user.id
+                                        "user": course_user.user.username
                                         }
                                     )
         
@@ -172,7 +172,7 @@ class WebhookTests(TestCase):
                                     content_type="application/json", 
                                     data={
                                         "id": test_achievement.id,
-                                        "user": course_user.id
+                                        "user": course_user.user.username
                                         }
                                     )
         
@@ -428,7 +428,7 @@ class WebhookTests(TestCase):
                                     content_type="application/json", 
                                     data={
                                         "id": test_achievement.id,
-                                        "user": course_user.id
+                                        "user": course_user.user.username
                                         }
                                     )
         

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}Base{% endblock %} | ScalableTeaching Reimplemenation</title>
+        <!-- Load JQuery-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> 
+    </head>
+    <body>
+
+        <!--Page Content goes here-->
+        {% block content %}
+        {% endblock %}
+
+        <div id="div1">
+
+        </div>
+
+        <!--Global Toasts-->
+        {{ request.user.is_authenticated }}
+        {% if request.user.is_authenticated %}
+            <script>
+                function pollAchievements() {
+                    $.ajax({url: '/webhooks/poll_achievements/{{request.user}}', 
+                        headers: {
+                            "Achievement-Webhook-Token": "{{ ACHIEVEMENT_WEBHOOK_TOKEN }}"
+                        },
+                        success: function(result) {
+                            $("#div1").append(result + "<br>")
+                        }});
+                    
+                }
+
+                pollAchievements();
+
+                setInterval(pollAchievements, 5000)
+            </script>
+        {% endif %}
+    </body>
+</html>

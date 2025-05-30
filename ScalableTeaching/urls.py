@@ -21,6 +21,7 @@ urlpatterns = [
     path('courses/', include('courses.urls')),
     path('webhooks/', include('webhook.urls')),
     path('gitlab/', include('gitlab_surface_mock.urls')),
+    path('', include('home.urls')),
     #path('endpoints/', include('request_endpoint.urls')),
     path('admin/', admin.site.urls),
 ]

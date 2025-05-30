@@ -24,7 +24,7 @@ from django.contrib.auth import get_user_model
 @non_atomic_requests
 @csrf_exempt
 def webhook_test(request):
-    given_token = request.headers.get("Achievement-Webhook-Token", "")
+    given_token = request.headers.get("Achievement-Webhook-Token","")
     if not compare_digest(given_token, settings.ACHIEVEMENT_WEBHOOK_TOKEN): # Protect against weaponized autism (also known as timing attacks)
         return HttpResponseForbidden("Incorrect token in Webhook-Token header.", content_type="text/plain")
     
@@ -60,17 +60,17 @@ def achievement_webhook(request):
 
 @require_GET
 @csrf_exempt
-def poll_achievements(request, user_id):
+def poll_achievements(request, username):
     given_token = request.headers.get("Achievement-Webhook-Token", "")
     if not compare_digest(given_token, settings.ACHIEVEMENT_WEBHOOK_TOKEN): # Protect against weaponized autism (also known as timing attacks)
         return HttpResponseForbidden(json.dumps({"error": "Incorrect Token"}), content_type="application/json")
     
     #print(request.body)
-    if user_id == None or user_id == "":
+    if username == None or username == "":
         return HttpResponseBadRequest(json.dumps({"error": "No User Provided"}), content_type="application/json")
     
     try:
-        user = get_user_model().objects.get(id=user_id)
+        user = get_user_model().objects.get(username=username)
         course_user = CourseUser.objects.get(user=user)
         toasts = QueuedAchievementToast.objects.filter(user=course_user)
 
@@ -248,15 +248,20 @@ def process_achievement_webhook_payload(payload):
         return ("Ensure you've formatted your request properly.", HTTPStatus.BAD_REQUEST)
     
     try:
-        user = CourseUser.objects.get(id=username)
         achievement = Achievement.objects.get(id=achievement_id)
-        user.achievements.add(achievement)
-        user.points += achievement.point_value
-        user.save()
+        print(achievement.course)
+        user_model_user = get_user_model().objects.get(username=username)
+        print(user_model_user.username)
+        course_user = CourseUser.objects.get(course=achievement.course, user=user_model_user)
+        course_user.achievements.add(achievement)
+        course_user.points += achievement.point_value
+        course_user.save()
     except CourseUser.DoesNotExist:
         return ("User not found", HTTPStatus.NOT_FOUND)
     except Achievement.DoesNotExist:
         return ("Achievement not found", HTTPStatus.NOT_FOUND)
+    except get_user_model().DoesNotExist:
+        return ("User (django) not found", HTTPStatus.NOT_FOUND)
     
     # If this succeeds, create a achievement toast in the queue.
     # If we've made it this far, both the user and the achievement are known good.
@@ -265,7 +270,7 @@ def process_achievement_webhook_payload(payload):
         received_at__lte=timezone.now() - datetime.timedelta(days=30) # Delete toasts older than a month. 
     ).delete()
 
-    QueuedAchievementToast.objects.create(user=user, achievement=achievement)
+    QueuedAchievementToast.objects.create(user=course_user, achievement=achievement)
     return ("Achievement granted successfully", HTTPStatus.OK)
     
 
