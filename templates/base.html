@@ -20,6 +20,7 @@
         {% if request.user.is_authenticated %}
             <script>
                 function pollAchievements() {
+                    console.log("Polling for Achievements")
                     $.ajax({url: '/webhooks/poll_achievements/{{request.user}}', 
                         headers: {
                             "Achievement-Webhook-Token": "{{ ACHIEVEMENT_WEBHOOK_TOKEN }}"

@@ -94,7 +94,6 @@ def poll_achievements(request, username):
         return HttpResponseNotFound(json.dumps({"error": "User not in any courses"}))
     
 
-@require_POST
 @non_atomic_requests
 @csrf_exempt
 def gitlab_receive(request):
@@ -108,6 +107,7 @@ def gitlab_receive(request):
     payload = json.loads(request.body)
 
     #print(payload)
+    print(payload.get("project").get("id"))
 
     process_gitlab_pipeline(payload.get("project").get("id"))
     
