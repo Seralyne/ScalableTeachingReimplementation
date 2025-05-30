@@ -25,7 +25,7 @@ class WebhookTests(TestCase):
         assert (response.content.decode() == "Incorrect token in Webhook-Token header.")
 
     def test_bad_token(self):
-        response = self.client.post("/webhooks/test", ACHIEVEMENT_WEB_TOKEN="Hmph! How very glib! And do you believe in Eorzea?")
+        response = self.client.post("/webhooks/test", HTTP_ACHIEVEMENT_WEB_TOKEN="Hmph! How very glib! And do you believe in Eorzea?")
         assert response.status_code == HTTPStatus.FORBIDDEN
         assert (response.content.decode() == "Incorrect token in Webhook-Token header.")
 
@@ -177,7 +177,7 @@ class WebhookTests(TestCase):
                                     )
         
         
-        print(response.content.decode())
+        #print(response.content.decode())
         assert response.status_code == HTTPStatus.OK
         assert response.content.decode() == "Achievement granted successfully"
         assert not QueuedAchievementToast.objects.filter(id=old_achievement_toast.id).exists()
@@ -366,3 +366,82 @@ class WebhookTests(TestCase):
         #assert 
 
 
+    def test_polling_endpoint_not_get(self):
+        #print("polling test")
+        response = self.client.post("/webhooks/poll_achievements/35") # Random User ID to prevent 404
+        #print(response.status_code)
+        #print(response.body)
+        #print(response.status_code)
+        assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED
+        #assert response.content.decode() == json.dumps({"error": "Only GET requests allowed"})
+
+ 
+
+    def test_polling_endpoint_wrong_token(self):
+        response = self.client.get("/webhooks/poll_achievements/35", HTTP_ACHIEVEMENT_WEBHOOK_TOKEN="Hmph! How very glib! And do you believe in Eorzea?")
+        assert response.status_code == HTTPStatus.FORBIDDEN
+        assert (response.content.decode() == json.dumps({"error": "Incorrect Token"}))
+
+
+    def test_polling_endpoint_wrong_user(self):
+        response = self.client.get("/webhooks/poll_achievements/35", HTTP_ACHIEVEMENT_WEBHOOK_TOKEN="Tell me, for whom do you fight?")
+        assert response.status_code == HTTPStatus.NOT_FOUND
+        assert (response.content.decode() == json.dumps({"error": "User not found"}))
+    
+
+    def test_polling_endpoint_no_user(self):
+        obj = {"eorzea": "Bruh"}
+        serialized_obj = json.dumps(obj)
+        response = self.client.get("/webhooks/poll_achievements/", HTTP_ACHIEVEMENT_WEBHOOK_TOKEN="Tell me, for whom do you fight?")
+        #print(response.content.decode())
+        assert response.status_code == HTTPStatus.NOT_FOUND
+        #assert (response.content.decode() == json.dumps({"error": "Malformed JSON"}))
+
+
+    def test_polling_endpoint_user_not_in_any_courses(self):
+        obj = {"eorzea": "Bruh"}
+
+        start = timezone.now()
+        User = get_user_model()
+        user = User.objects.create_user(username="testuser", password="testpassword")
+        response = self.client.get("/webhooks/poll_achievements/{user_id}".format(user_id=user.id), 
+                                   HTTP_ACHIEVEMENT_WEBHOOK_TOKEN="Tell me, for whom do you fight?",
+                                   content_type="application/json")
+        #print(response.content.decode())
+        #print(response.content.decode())
+        assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+    def test_polling_endpoint_success(self):
+        obj = {"eorzea": "Bruh"}
+
+        start = timezone.now()
+        User = get_user_model()
+        user = User.objects.create_user(username="testuser", password="testpassword")
+        course = Course.objects.create(name="Test")
+        course.students.add(user)
+        course.students.get()
+        course_user = CourseUser.objects.get(user=user, course=course)
+        test_achievement = Achievement.objects.create(course=course, name="Test", description="Test", rarity=AchievementRarity.COMMON, point_value=5)
+        response = self.client.post("/webhooks/achievement/award", 
+                                    HTTP_ACHIEVEMENT_WEBHOOK_TOKEN="Tell me, for whom do you fight?", 
+                                    content_type="application/json", 
+                                    data={
+                                        "id": test_achievement.id,
+                                        "user": course_user.id
+                                        }
+                                    )
+        
+        
+        assert response.status_code == HTTPStatus.OK
+        assert response.content.decode() == "Achievement granted successfully"
+        assert QueuedAchievementToast.objects.filter(user=course_user, achievement=test_achievement).exists()
+        
+        response = self.client.get("/webhooks/poll_achievements/{user_id}".format(user_id=user.id), 
+                                   HTTP_ACHIEVEMENT_WEBHOOK_TOKEN="Tell me, for whom do you fight?",
+                                   content_type="application/json")
+        #print(response.content.decode())
+        #print(response.content.decode())
+        assert response.status_code == HTTPStatus.OK
+        assert not QueuedAchievementToast.objects.filter(user=course_user).exists() # User should have no queued toasts afterwards
+        #assert (response.content.decode() == json.dumps({"error": "Malformed JSON"}))

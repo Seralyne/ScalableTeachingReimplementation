@@ -6,13 +6,14 @@ from django.conf import settings
 from django.db.transaction import atomic, non_atomic_requests
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.core.exceptions import BadRequest
 from django.utils import timezone
 from .models import WebhookMessage
 from courses.models import Achievement, QueuedAchievementToast, CourseUser, AchievementTrigger, CourseUserTriggerProgress
 from http import HTTPStatus
 import requests
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 
@@ -57,6 +58,41 @@ def achievement_webhook(request):
 
     return HttpResponse(message, status=status, content_type="text/plain")
 
+@require_GET
+@csrf_exempt
+def poll_achievements(request, user_id):
+    given_token = request.headers.get("Achievement-Webhook-Token", "")
+    if not compare_digest(given_token, settings.ACHIEVEMENT_WEBHOOK_TOKEN): # Protect against weaponized autism (also known as timing attacks)
+        return HttpResponseForbidden(json.dumps({"error": "Incorrect Token"}), content_type="application/json")
+    
+    #print(request.body)
+    if user_id == None or user_id == "":
+        return HttpResponseBadRequest(json.dumps({"error": "No User Provided"}), content_type="application/json")
+    
+    try:
+        user = get_user_model().objects.get(id=user_id)
+        course_user = CourseUser.objects.get(user=user)
+        toasts = QueuedAchievementToast.objects.filter(user=course_user)
+
+        return_list = []
+
+        for toast in toasts:
+            return_list.append(
+                {
+                    "name": toast.achievement.name,
+                    "description": toast.achievement.description,
+                    "rarity": toast.achievement.rarity,
+                    "points": toast.achievement.point_value
+                        
+                })
+            
+        QueuedAchievementToast.objects.filter(user=course_user).delete() # Clear Toasts
+        return HttpResponse(json.dumps(return_list))
+    except get_user_model().DoesNotExist:
+        return HttpResponseNotFound(json.dumps({"error": "User not found"}))
+    except CourseUser.DoesNotExist:
+        return HttpResponseNotFound(json.dumps({"error": "User not in any courses"}))
+    
 
 @require_POST
 @non_atomic_requests
@@ -123,6 +159,9 @@ def isolate_test_and_result(jobs):
         
     #print(list_of_processed_jobs)
     return list_of_processed_jobs        
+
+
+
 
 # Future Work: Generalize beyond a single achievement.
 @atomic
