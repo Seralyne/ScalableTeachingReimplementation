@@ -19,7 +19,7 @@ This is a reimplementation of the vertical slice of ScalableTeaching necessary f
 
         * Windows (cmd): <venv>\Scripts\activate.bat
         * Linux/Mac (assuming bash/zsh): source <venv>/bin/activate
-        * For other shells, see [the Python venv documentation](https://docs.python.org/3/library/venv.html)
+For other shells, see [the Python venv documentation](https://docs.python.org/3/library/venv.html)
 
 
 ## Configuring the project
@@ -33,6 +33,8 @@ If you plan on running this against a real GitLab instance (not recommended - un
 
 ## Running the project
 
+If you're running against the mocked GitLab instance, make sure to run that first using `flask --app gitlab_mock run`
+
 1.  Ensure you've entered the previously created virtual environment and installed the dependencies by running the previous steps.
 2.  Ensure you've changed the default settings for the tokens. 
 3.  Ensure you've run all the migrations by running `python manage.py migrate`
@@ -41,10 +43,11 @@ If you plan on running this against a real GitLab instance (not recommended - un
 
 ## Running tests
 
+If you're testing against the mocked GitLab instance, make sure to run that first using `flask --app gitlab_mock run`
+
 1.  Ensure you've entered the previously created virtual environment and installed the dependencies by running the previous steps until (but not including) "Running the Project".
 2.  Ensure you've run all the migrations by running `python manage.py migrate`
 3.  Run `python manage.py test`
 
-ensure that the Flask mock of a GitLab backend is running by running `flask --app gitlab_mock run`
 
 
