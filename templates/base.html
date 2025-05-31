@@ -42,9 +42,61 @@
         <!--Global Toasts-->
 
 
-        {{ request.user.is_authenticated }}
+
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;" id="achievementToastContainer">
+            <!-- Empty Because it's a container that will be added to through JavaScript -->
+        </div>
+
+   
+
+
+
         {% if request.user.is_authenticated %}
             <script>
+
+
+                
+                // Evaluate the rarity to its long name
+                function evaluateRarity(rarityShorthand) {
+                    const rarities = {"CM": "Common", "RA": "Rare", "EP": "Epic", "LG": "Legendary"}
+                    return rarities[rarityShorthand];
+                }
+
+                // Toast Creation Helper Method
+                function createAchievementToast(rarity, achievementName, achievementDescription, points) {
+                    const toastId = 'toast' + Date.now() // Make sure each ID is unique
+                    const toastHTML = `
+                    <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <img src="" class="rounded me-2" alt="...">
+                            <strong class="me-auto">Achievement Unlocked!</strong>
+                            <small class="text-body-secondary">${rarity}</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            <strong>${achievementName}</strong>
+                            <br />
+                            ${achievementDescription}
+                            <br />
+                            <small class="text-body-secondary">${points} points</small>
+                        </div>
+                    </div>`
+
+                    $('#achievementToastContainer').append(toastHTML);
+
+
+                    const toastElement = $("#"+toastId);
+                    const toast = new bootstrap.Toast(toastElement);
+                    toast.show();
+
+                    // Clean up after myself ffs
+                    $(toastElement).on('hidden.bs.toast', function() {
+                        $(this).remove();
+                    });
+
+                    
+
+                }
 
                 let pollInterval; 
 
@@ -57,7 +109,24 @@
                             "Achievement-Webhook-Token": "{{ ACHIEVEMENT_WEBHOOK_TOKEN }}"
                         },
                         success: function(result) {
-                            $("#div1").append(result + "<br>")
+                            resultObj = JSON.parse(result)
+                            console.log(resultObj)
+                            if (resultObj.length == 0) {
+                                return;
+                            } // Do nothing if no news
+                                
+                            //$("#div1").append(result + "<br>");
+                            for (const toast of resultObj) {
+                                let rarity = evaluateRarity(toast.rarity)
+                                let name = toast.name
+                                let desc =  toast.description
+                                let points = toast.points
+                                createAchievementToast(rarity, name, desc, points);
+                            };
+                            
+                            
+                            
+
                         },
                         error: function(xhr, status, error) {
                             if (xhr.status == 404) {
@@ -71,7 +140,7 @@
 
                 pollAchievements();
 
-                pollInterval = setInterval(pollAchievements, 5000);
+                pollInterval = setInterval(pollAchievements, 1000);
             </script>
         {% endif %}
     </body>

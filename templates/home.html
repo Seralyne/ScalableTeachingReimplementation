@@ -2,6 +2,47 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>Hello, World!</h1>
+
+
+<!-- Jumbotron Borrowed from https://getbootstrap.com/docs/5.3/examples/jumbotrons/ -->
+<div class="container my-5">
+     <div class="p-5 text-center bg-body-tertiary rounded-3">
+        <h1 class="text-body-emphasis">Assignment Tracking</h1> 
+        <p class="col-lg-8 mx-auto fs-5 text-muted">
+            This page keeps track of your assignments and tells you instantly when an assignment has been passed.
+        </p>
+        <div class="d-inline-flex gap-2 mb-5"> 
+            <button class="d-inline-flex align-items-center btn btn-success btn-lg px-4 rounded-pill" type="button">
+                Get Started Now
+            </button>
+        </div> 
+    </div> 
+</div>
+
+<div class="container px-4 py-5" id="featured-3">
+    <h2 class="pb-2 border-bottom">Statistics</h2>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Assignments and Projects</h3>
+            <p>In total, <strong>191</strong> assignments have been created with an associated <strong>3704</strong> projects.</p> 
+        </div> 
+        <div class="feature col"> 
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3"> 
+            </div> 
+            <h3 class="fs-2 text-body-emphasis">0 Builds</h3>
+            <p>During the last month <strong>0</strong> builds have run, with an averge run time of <strong>0.00</strong> seconds</p>
+        </div> 
+        <div class="feature col">
+            <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3"> 
+            </div>
+            <h3 class="fs-2 text-body-emphasis">Average Queue Time</h3> 
+            <p>Over the last month the average queue time has been <strong>0.00</strong> seconds</p> 
+        </div>
+    </div>
+</div>
+
+
 
 {% endblock %}

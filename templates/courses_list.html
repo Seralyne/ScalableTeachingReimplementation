@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Courses{% endblock %}
+
+{% block content %}
+<br>
+<br>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Courses</a></li>
+  </ol>
+</nav>
+
+<h1>Courses</h1>
+
+<br>
+
+<div class="h-100 p-5 bg-body-tertiary border rounded-3">
+    
+
+    <div class="row row-cols-4">
+        {% for course_user in course_users %}
+        
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img src="" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">{{course_user.course.name}}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary"></h6>
+                    <p class="card-text"></p>
+                    <p class="card-text"><small class="text-body-secondary">{{ course_user.points }} points</small></p>
+                  <a href="{% url 'course' course_user.course.id %}" class="btn btn-primary">Go to course</a>
+                </div>
+              </div>
+        </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

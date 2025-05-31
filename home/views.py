@@ -21,7 +21,7 @@ def signup(request):
             if new_user is not None:
                 login(request, new_user)
                 messages.success(request, ("Registration Successful"))
-                return redirect('index')
+                return redirect('courses')
         else:
             print(form.errors)
     else:
@@ -40,7 +40,7 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('index')
+            return redirect('courses')
         else:
             messages.success(request, ("There was an error logging you in. Double check your credentials and try again."))
             return redirect('login')

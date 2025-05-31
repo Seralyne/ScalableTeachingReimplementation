@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ course.name }}{% endblock %}
+
+{% block content %}
+<br>
+<br>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'courses' %}">Courses</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{course.name}}</li>
+  </ol>
+</nav>
+
+
+<div class="h-100 p-5 bg-body-tertiary border rounded-3">
+
+    <div class="container">
+        <div class="row align-items-start">
+            <div class="col-md-9">
+                <h1>{{ course.name }}</h1>
+                <h5>{{ course_user.points }} points</h5>
+            </div>
+            <hr>
+            <p>The following tasks and subtasks are front-end only, intended to show what tasks and subtasks would have looked like if I were to properly implement them.</p>
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action list-group-item-dark" aria-current="true">
+                    <div class="text-center">
+                        <h5 class="mb-1" align="center">Lesson 1</h5>
+                    </div>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Design Patterns</h5>
+                        <small class="text-body-secondary">Opened 3 days ago</small>
+                    </div>
+                    <p class="mb-1">Closes 1 month from now.</p>
+                </a>
+            </div>
+            <div class="list-group mt-4">
+                <a href="#" class="list-group-item list-group-item-action list-group-item-dark" aria-current="true">
+                    <div class="text-center">
+                        <h5 class="mb-1" align="center">Lesson 2</h5>
+                    </div>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Ciphers &amp; Polymorphism</h5>
+                        <small class="text-body-secondary">Opened 3 days ago</small>
+                    </div>
+                    <p class="mb-1">Closes 1 month from now.</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Avalonia Introduction</h5>
+                        <small class="text-body-secondary">Opened 3 days ago</small>
+                    </div>
+                    <p class="mb-1">Closes 1 month from now.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}
