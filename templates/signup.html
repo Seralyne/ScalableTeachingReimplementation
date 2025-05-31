@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+
+{% if form.errors %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>There was an error with your form.</strong> Check below for details
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>  
+{% endif %}
+
+
+<div class="h-100 p-5 bg-body-tertiary border rounded-3">
+    <div class="container">
+        <form method="POST" action="{% url 'signup' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <div id="usernameHelp" class="form-text">Pick a unique username.</div>
+                {{ form.username }}
+            </div>
+
+            <div class="mb-3">
+                <label for="password1" class="form-label">Password</label>
+                <div id="passwordHelp" class="form-text">Pick a strong and secure password.</div>
+                {{ form.password1 }}
+            </div>
+
+            <div class="mb-3">
+                <label for="password2" class="form-label">Repeat Password</label>
+                <div id="password2Help" class="form-text">Now type it again.</div>
+                {{ form.password2 }}
+            </div>
+
+            <button type="Submit" class="btn btn-success">Sign up</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
