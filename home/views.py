@@ -2,13 +2,20 @@ from django.shortcuts import render, redirect
 from .forms import SignupForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from courses.models import CourseUser, Achievement
 
 # Create your views here.
 
 def index(request):
     return render(request, 'home.html')
 
+def user_profile(request):
+    best_accomplishment = CourseUser.objects.filter(user=request.user).order_by('-points').first() # Get course user objects and order by points in descending order, take the first element to get best accomplishment
+    all_achievements = Achievement.objects.filter(courseuser__user=request.user).distinct()
+    context = {"best_accomplishment": best_accomplishment, "all_achievements": all_achievements}
 
+    return render(request, "user_profile.html", context)
 
 def signup(request):
     if request.method == "POST":
@@ -48,23 +55,3 @@ def login_user(request):
         return render(request, 'login.html')
 
 
-"""
-def signup(request):
-    form = SignupForm(request.POST)
-    if form.is_valid():
-        username = form.cleaned_data.get("username")
-        password = form.cleaned_data.get("password1")
-        form.save()
-        new_user = authenticate(username=username, password=password)
-        if new_user is not None:
-            login(request, new_user)
-            return redirect("index")
-    else:
-        form = SignupForm()
-    
-    context = {
-        "form": form
-    }
-    return render(request, "signup.html", context)
-
-"""

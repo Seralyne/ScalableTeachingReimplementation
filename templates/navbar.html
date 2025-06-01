@@ -12,7 +12,7 @@
             <li class="nav-item">
                 <a class="nav-link active" href="{% url 'courses' %}">Courses</a>
             </li>
-            <li class="nav-item navbar-text active"><span class="bg-success active" style="border-radius: 15%; padding: .25em; color:#FFFFFF;">{{request.user}}</span></li>
+            <li class="nav-item navbar-text active"><a href="{% url 'user_profile' %}" class="bg-success active" style="border-radius: .25em; padding: .25em; color:#FFFFFF;">{{request.user}}</a></li>
             <li class="nav-item active">
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
